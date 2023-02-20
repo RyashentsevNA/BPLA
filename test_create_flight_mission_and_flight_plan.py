@@ -7,8 +7,6 @@ from selenium.webdriver.support import expected_conditions
 # инициализируем драйвер браузера
 driver = webdriver.Chrome()
 driver.set_window_size(1920,1080)
-# неявное ожидание
-# driver.implicitly_wait(60)
 driver.get("http://aisgin.dmz.test.ot/master/Account/Login")
 driver.find_element(By.ID, "forms-auth-btn" ).click()
 #Ввод логина
@@ -19,14 +17,10 @@ driver.find_element(By.ID, "Password" ).send_keys("password123")
 driver.find_element(By.ID, "login-btn" ).click()
 #Нажимает реестр заданий на облет
 WebDriverWait(driver, 60).until(expected_conditions.element_to_be_clickable((By.LINK_TEXT, "Реестр заданий на облет" ))).click()
-time.sleep(20)
+#Ожидаем загрузки реестра до отодражения лупы
+WebDriverWait(driver, 160).until(expected_conditions.visibility_of_element_located((By.XPATH, "//tbody/tr[2]/td[13]/div[1]/a[1]/button[1]/span[1]/*[1]" )))
 #Нажимает Добавить запись
-
-WebDriverWait(driver, 160).until(expected_conditions.presence_of_element_located((By.XPATH, "//tbody/tr[2]/td[1]" )))
-try:
-    elementik = WebDriverWait(driver, 60).until(expected_conditions.element_to_be_clickable((By.XPATH, "//span[contains(text(),'Добавить запись')]" )))
-finally:
-    elementik.click()
+WebDriverWait(driver, 60).until(expected_conditions.element_to_be_clickable((By.XPATH, "//span[contains(text(),'Добавить запись')]" ))).click()
 #Выбор ОКРУГА
 driver.find_element(By.ID, "realestateAo").click()
 driver.find_element(By.XPATH, "/html/body/div[2]/div/div/div/div[2]/div[1]/div/div/div[1]" ).click()
@@ -54,7 +48,7 @@ time.sleep(3)
 element = driver.find_element(By.XPATH, "//span[contains(text(),'Сохранить')]")
 driver.execute_script("arguments[0].scrollIntoView();", element)
 driver.find_element(By.XPATH, "//span[contains(text(),'Сохранить')]").click()
-time.sleep(5)
+time.sleep(10)
 
 
 #Проверка на элемент: статус Запланировано и план полета
@@ -62,10 +56,31 @@ status = driver.find_element(By.XPATH, "//span[contains(text(),'Запланир
 plan = driver.find_element(By.XPATH, "//a[contains(text(),'План полета')]").text
 status_obleta='Запланировано'
 flightplan = 'План полета'
-if status == status_obleta and flightplan ==plan:
-    print('Тест пройден')
-else:
-    print('Все сломалось')
+assert status == status_obleta and plan == flightplan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# if status == status_obleta and flightplan ==plan:
+#     print('Тест пройден')
+# else:
+#     print('Все сломалось')
 
 
 # Это можно сделать через класс expected_conditions. Нужно указать его, а потом через точку — само условие. Частые условия:
@@ -83,3 +98,5 @@ else:
 #y.NAME # поиск по атрибуту name
 # By.TAG_NAME # поиск по HTML-тегу
 # By.XPATH # поиск по XPath
+
+
